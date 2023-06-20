@@ -3,6 +3,7 @@ from dateutil import parser
 import asyncio
 import os
 import socketio
+from sync_blocks import SyncBlocksHandler
 
 async def run_command(args):
     process = await asyncio.create_subprocess_exec(
@@ -49,9 +50,22 @@ async def network_error_handler(data: dict):
 
     await run_command(['make', 'start'])
 
+async def sync_blocks_handler(data: dict):
+    start_block = data.get('start_block', '0')
+    end_block = data.get('end_block', '0')
+    node_ips = data.get('node_ips', [])
+
+    if len(node_ips) == 0:
+        return
+
+    sync_blocks_hander = SyncBlocksHandler(start_block, end_block, node_ips)
+    await sync_blocks_hander.start()
+
+
 event_handlers = {
     'upgrade': upgrade_handler,
-    'network_error': network_error_handler
+    'network_error': network_error_handler,
+    'sync_blocks': sync_blocks_handler
 }
 
 sio = socketio.AsyncClient()

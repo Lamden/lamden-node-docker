@@ -2,3 +2,5 @@
 venv
 logs/
 .python-version
+tests/__pycache__
+utils/__pycache__
